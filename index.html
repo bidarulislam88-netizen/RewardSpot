@@ -19,7 +19,7 @@
     .logo{width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg,#0b74ff,#00c2ff); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700}
     .nav{display:flex; gap:12px; align-items:center}
     .nav a{color:var(--muted); text-decoration:none; font-size:14px}
-    .cta-small{background:var(--accent); color:#fff !important; padding:10px 14px; border-radius:8px; text-decoration:none; font-weight:600}
+    .cta-small{background:var(--accent); color:#fff; padding:10px 14px; border-radius:8px; text-decoration:none; font-weight:600}
 
     /* Hero */
     .hero{display:grid; grid-template-columns:1fr 380px; gap:28px; align-items:center; margin-top:28px}
@@ -41,7 +41,7 @@
     .offer{background:var(--card); border-radius:12px; padding:14px; box-shadow:0 8px 20px rgba(2,6,23,0.04); display:flex; flex-direction:column; gap:8px}
     .offer h3{margin:0; font-size:16px}
     .offer p{margin:0; color:var(--muted); font-size:13px}
-    .offer .btn{margin-top:auto; background:var(--accent); color:#fff; padding:10px; border-radius:8px; text-align:center; text-decoration:none; display:block}
+    .offer .btn{margin-top:auto; background:var(--accent); color:#fff; padding:10px; border-radius:8px; text-align:center; text-decoration:none}
 
     /* Trust & footer */
     .trust{display:flex; gap:12px; align-items:center; margin-top:18px}
@@ -78,7 +78,7 @@
         <a href="#offers">Offers</a>
         <a href="#how">How it works</a>
         <a href="#faq">FAQ</a>
-        <a class="cta-small" href="#get" onclick="handleGetRewards()">Get Rewards</a>
+        <a class="cta-small" href="#get">Get Rewards</a>
       </nav>
     </header>
 
@@ -129,7 +129,10 @@
           <div style="color:var(--muted); font-size:13px">Updated: <strong id="date">--</strong></div>
         </div>
 
-        <div class="offers" id="offersGrid"></div>
+        <div class="offers" id="offersGrid">
+          <!-- Offers will be injected by JS -->
+        </div>
+
       </section>
 
       <section id="faq" style="margin-top:28px">
@@ -137,6 +140,7 @@
         <details style="background:var(--card); padding:12px; border-radius:8px; margin-top:8px"><summary>Is RewardSpot free?</summary><p class="small-muted">Yes — joining is free. Some offers may ask for purchase; always read offer details.</p></details>
         <details style="background:var(--card); padding:12px; border-radius:8px; margin-top:8px"><summary>How do I get paid?</summary><p class="small-muted">Many offers pay via gift cards or cashouts once you complete the required steps.</p></details>
       </section>
+
     </main>
 
     <footer>
@@ -158,11 +162,12 @@
   </div>
 
   <script>
+    // Basic demo offers (replace with your real offers/data)
     const offers = [
-      {id:1, title:'$5 Amazon Gift Card', desc:'Complete a short survey to claim a $5 Amazon e-gift card.', reward:'$5', cta:'Claim Now', link:'https://example.com/amazon'},
-      {id:2, title:'Free App Install - Get 100 Coins', desc:'Install and open the partner app to earn 100 coins redeemable for rewards.', reward:'In-app', cta:'Install App', link:'https://example.com/app'},
-      {id:3, title:'$10 Walmart Card', desc:'Try a free trial and get a $10 Walmart gift card after verification.', reward:'$10', cta:'Get $10', link:'https://example.com/walmart'},
-      {id:4, title:'Spin & Win Sweepstakes', desc:'Enter the sweepstakes for a chance to win up to $100.', reward:'Sweepstakes', cta:'Enter Now', link:'https://example.com/sweepstakes'}
+      {id:1, title:'$5 Amazon Gift Card', desc:'Complete a short survey to claim a $5 Amazon e-gift card.', reward:'$5', cta:'Claim Now'},
+      {id:2, title:'Free App Install - Get 100 Coins', desc:'Install and open the partner app to earn 100 coins redeemable for rewards.', reward:'In-app', cta:'Install App'},
+      {id:3, title:'$10 Walmart Card', desc:'Try a free trial and get a $10 Walmart gift card after verification.', reward:'$10', cta:'Get $10'},
+      {id:4, title:'Spin & Win Sweepstakes', desc:'Enter the sweepstakes for a chance to win up to $100.', reward:'Sweepstakes', cta:'Enter Now'}
     ];
 
     function renderOffers(){
@@ -170,32 +175,30 @@
       grid.innerHTML='';
       offers.forEach(o=>{
         const el = document.createElement('div'); el.className='offer';
-        el.innerHTML = `
-          <h3>${o.title}</h3>
-          <p>${o.desc}</p>
-          <div style='display:flex;gap:8px;align-items:center;'>
-            <div style='font-weight:700'>Reward: ${o.reward}</div>
-            <a class='btn' href='${o.link}' target='_blank'>${o.cta}</a>
-          </div>`;
+        el.innerHTML = `<h3>${o.title}</h3><p>${o.desc}</p><div style='display:flex;gap:8px;align-items:center;'><div style='font-weight:700'>Reward: ${o.reward}</div><a class='btn' href='#' onclick='openOffer(${o.id});return false'>${o.cta}</a></div>`;
         grid.appendChild(el);
-      });
+      })
     }
 
-    function handleGetRewards(){
-      const email = prompt("Enter your email to get started:");
-      if(email){
-        alert('Thanks! We sent offers to ' + email + 'https://otieu.com/4/9293042');
-        window.open(offers[0].link, '_blank');
-      }
+    function openOffer(id){
+      const o = offers.find(x=>x.id===id);
+      document.getElementById('modalTitle').textContent = o.title;
+      document.getElementById('modalDesc').textContent = o.desc + ' (Offer terms apply.)';
+      const action = document.getElementById('modalAction');
+      action.href = '#';
+      action.onclick = function(e){ e.preventDefault(); alert('Redirecting to offer partner (demo).'); closeModal(); }
+      document.getElementById('modal').style.display = 'flex';
     }
+    function closeModal(){ document.getElementById('modal').style.display = 'none'; }
 
     function handleForm(e){
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
       if(!email) return alert('Please enter a valid email');
-      alert('Thanks! We sent offers to ' + email + 'https://otieu.com/4/9293042');
+      // Demo: show success then open modal
+      alert('Thanks! We sent offers to ' + email + ' (demo).');
       document.getElementById('email').value='';
-      window.open(offers[0].link, '_blank');
+      openOffer(1);
       return false;
     }
 
@@ -205,4 +208,3 @@
   </script>
 </body>
 </html>
-
